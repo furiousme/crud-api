@@ -8,7 +8,8 @@
     "start": "node build/index.js",
     "build": "tsc",
     "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix"
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier . --write"
   },
   "author": "furiousme",
   "license": "ISC",
@@ -17,6 +18,7 @@
     "@types/eslint__js": "^8.42.3",
     "eslint": "^9.13.0",
     "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
     "tsc": "^2.0.4",
     "typescript": "^5.6.3",

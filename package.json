@@ -7,6 +7,7 @@
     "start:dev": "nodemon -r dotenv/config src/index.ts dotenv_config_path=.env.development",
     "build": "webpack --config webpack.config.mjs",
     "start:prod": "npm run build && node dist/bundle.js",
+    "start:multi": "MODE=multi nodemon -r dotenv/config src/index.ts dotenv_config_path=.env.development",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier . --write",
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@types/eslint__js": "^8.42.3",
+    "@types/uuid": "^10.0.0",
     "eslint": "^9.13.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.5",
@@ -39,6 +41,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "dotenv-webpack": "^8.1.0",
+    "uuid": "^10.0.0",
     "webpack-node-externals": "^3.0.0"
   }
 }

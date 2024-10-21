@@ -1,13 +1,13 @@
-import { HTTPStatusCode } from '../types';
+import { HTTPStatusCode } from "../types";
 
 class AppError extends Error {
   code: HTTPStatusCode;
-  message: string;
+  friendlyMessage: string;
 
   constructor(code: HTTPStatusCode, message: string) {
     super();
     this.code = code;
-    this.message = message;
+    this.friendlyMessage = message;
   }
 }
 

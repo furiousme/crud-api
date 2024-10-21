@@ -3,6 +3,8 @@ import AppError from './errors/app-error';
 import processError from './errors/process-error';
 import UsersService from './services/users-service';
 import { HTTPMethod, HTTPStatusCode } from './types';
+import { logger } from './logger';
+import { sendResponse } from './utils';
 
 const usersService = new UsersService();
 
@@ -14,16 +16,11 @@ const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
   const [apiPath, model, modelId] = splittedPath.filter((el) => el);
 
   res.setHeader('Content-Type', 'application/json');
+  logger.info(`${method} ${pathname}`);
 
   if (!method || apiPath !== 'api' || model !== 'users') {
-    res.writeHead(HTTPStatusCode.NOT_FOUND);
-    res.end(
-      JSON.stringify({
-        success: false,
-        message: 'This route or HTTP method is not supported',
-      })
-    );
-    return;
+    const payload = { success: false, message: 'This endpoint does not exist' };
+    sendResponse({ res, code: HTTPStatusCode.NOT_FOUND, payload });
   }
 
   try {
@@ -32,27 +29,23 @@ const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
       switch (method) {
         case HTTPMethod.GET: {
           const users = await usersService.getAllUsers();
+          const payload = { success: true, data: users };
+          sendResponse({ res, code: HTTPStatusCode.OK, payload });
 
-          res.writeHead(HTTPStatusCode.OK);
-          res.end(JSON.stringify({ success: true, data: users }));
+          // console.log('check if it executed');
           break;
         }
 
         case HTTPMethod.POST: {
           let body = '';
-
-          req.on('data', (chunk) => {
-            body += chunk.toString();
-          });
-
+          req.on('data', (chunk) => (body += chunk.toString()));
           req.on('end', async () => {
             try {
-              const payload = JSON.parse(body);
-              const user = UsersService.validate(payload);
+              const input = JSON.parse(body);
+              const user = UsersService.validate(input);
               const record = await usersService.create(user);
-
-              res.writeHead(HTTPStatusCode.CREATED);
-              res.end(JSON.stringify({ success: true, data: record }));
+              const payload = { success: true, data: record };
+              sendResponse({ res, code: HTTPStatusCode.CREATED, payload });
             } catch (e) {
               processError(e, res);
             }
@@ -61,10 +54,7 @@ const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
         }
 
         default: {
-          throw new AppError(
-            HTTPStatusCode.BAD_REQUEST,
-            'This method is not allowed'
-          );
+          throw new AppError(HTTPStatusCode.BAD_REQUEST, 'This method is not allowed');
         }
       }
     } else {
@@ -72,27 +62,22 @@ const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
       switch (method) {
         case HTTPMethod.GET: {
           const user = await usersService.getUserById(modelId);
-
-          res.writeHead(HTTPStatusCode.OK);
-          res.end(JSON.stringify({ success: true, data: user }));
+          const payload = { success: true, data: user };
+          sendResponse({ res, code: HTTPStatusCode.OK, payload });
           break;
         }
 
         case HTTPMethod.PUT: {
           let body = '';
 
-          req.on('data', (chunk) => {
-            body += chunk.toString();
-          });
-
+          req.on('data', (chunk) => (body += chunk.toString()));
           req.on('end', async () => {
             try {
-              const payload = JSON.parse(body);
-              const user = UsersService.validate(payload);
+              const input = JSON.parse(body);
+              const user = UsersService.validate(input);
               const record = await usersService.update(modelId, user);
-
-              res.writeHead(HTTPStatusCode.OK);
-              res.end(JSON.stringify({ success: true, data: record }));
+              const payload = { success: true, data: record };
+              sendResponse({ res, code: HTTPStatusCode.OK, payload });
             } catch (e) {
               processError(e, res);
             }
@@ -102,17 +87,13 @@ const requestListener = async (req: IncomingMessage, res: ServerResponse) => {
 
         case HTTPMethod.DELETE: {
           await usersService.remove(modelId);
-
-          res.writeHead(HTTPStatusCode.NO_CONTENT);
-          res.end(JSON.stringify({ success: true }));
+          const payload = { success: true };
+          sendResponse({ res, code: HTTPStatusCode.NO_CONTENT, payload });
           break;
         }
 
         default: {
-          throw new AppError(
-            HTTPStatusCode.BAD_REQUEST,
-            'This method is not allowed'
-          );
+          throw new AppError(HTTPStatusCode.BAD_REQUEST, 'This method is not allowed');
         }
       }
     }

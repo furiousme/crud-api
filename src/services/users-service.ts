@@ -1,7 +1,7 @@
-import { HTTPStatusCode, User } from "./../types/index";
-import AppError from "../errors/app-error";
-import UsersRepository from "../repositories/users-repository";
-import * as uuid from "uuid";
+import { HTTPStatusCode, User } from './../types/index';
+import AppError from '../errors/app-error';
+import UsersRepository from '../repositories/users-repository';
+import * as uuid from 'uuid';
 
 class UsersService {
   repo: UsersRepository;
@@ -10,53 +10,35 @@ class UsersService {
     this.repo = new UsersRepository();
   }
 
-  static validate(dataToSave: Partial<User>): Omit<User, "id"> {
+  static validate(dataToSave: Partial<User>): Omit<User, 'id'> {
     const { username, age, hobbies } = dataToSave;
 
-    if (typeof username === "undefined") {
-      throw new AppError(
-        HTTPStatusCode.BAD_REQUEST,
-        "Username is required parameter"
-      );
+    if (typeof username === 'undefined') {
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Username is required parameter');
     }
 
-    if (typeof username !== "string") {
-      throw new AppError(
-        HTTPStatusCode.BAD_REQUEST,
-        "Username must be a string"
-      );
+    if (typeof username !== 'string') {
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Username must be a string');
     }
 
-    if (typeof age === "undefined") {
-      throw new AppError(
-        HTTPStatusCode.BAD_REQUEST,
-        "Age is required parameter"
-      );
+    if (typeof age === 'undefined') {
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Age is required parameter');
     }
 
     if (Number.isNaN(Number(age))) {
-      throw new AppError(HTTPStatusCode.BAD_REQUEST, "Age must be a number");
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Age must be a number');
     }
 
-    if (typeof hobbies === "undefined") {
-      throw new AppError(
-        HTTPStatusCode.BAD_REQUEST,
-        "Hobbies is required parameter"
-      );
+    if (typeof hobbies === 'undefined') {
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Hobbies is required parameter');
     }
 
     if (!Array.isArray(hobbies)) {
-      throw new AppError(
-        HTTPStatusCode.BAD_REQUEST,
-        "Hobbies must be an array of strings"
-      );
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Hobbies must be an array of strings');
     }
 
-    if (hobbies.some((el) => typeof el !== "string")) {
-      throw new AppError(
-        HTTPStatusCode.BAD_REQUEST,
-        "Hobbies must include strings only"
-      );
+    if (hobbies.some((el) => typeof el !== 'string')) {
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Hobbies must include strings only');
     }
 
     return {
@@ -72,15 +54,12 @@ class UsersService {
     return users;
   }
 
-  public async create(user: Omit<User, "id">): Promise<User> {
+  public async create(user: Omit<User, 'id'>): Promise<User> {
     try {
       const record = await this.repo.add(user);
       return record;
     } catch {
-      throw new AppError(
-        HTTPStatusCode.INTERNAL_SERVER,
-        "Unable to save record"
-      );
+      throw new AppError(HTTPStatusCode.INTERNAL_SERVER, 'Unable to save record');
     }
   }
 
@@ -88,34 +67,28 @@ class UsersService {
     const isIdValid = uuid.validate(id);
 
     if (!isIdValid) {
-      throw new AppError(HTTPStatusCode.BAD_REQUEST, "UUID is not valid");
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'UUID is not valid');
     }
 
     try {
       const user = await this.repo.getById(id);
       return user;
     } catch {
-      throw new AppError(
-        HTTPStatusCode.NOT_FOUND,
-        `User with id ${id} not found`
-      );
+      throw new AppError(HTTPStatusCode.NOT_FOUND, `User with id ${id} not found`);
     }
   }
 
-  public async update(id: string, user: Omit<User, "id">): Promise<User> {
+  public async update(id: string, user: Omit<User, 'id'>): Promise<User> {
     const isIdValid = uuid.validate(id);
 
     if (!isIdValid) {
-      throw new AppError(HTTPStatusCode.BAD_REQUEST, "UUID is not valid");
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'UUID is not valid');
     }
 
     try {
       await this.repo.getById(id);
-    } catch (e) {
-      throw new AppError(
-        HTTPStatusCode.NOT_FOUND,
-        `No user with id ${id} in the database`
-      );
+    } catch {
+      throw new AppError(HTTPStatusCode.NOT_FOUND, `No user with id ${id} in the database`);
     }
 
     try {
@@ -130,7 +103,7 @@ class UsersService {
     const isIdValid = uuid.validate(id);
 
     if (!isIdValid) {
-      throw new AppError(HTTPStatusCode.BAD_REQUEST, "UUID is not valid");
+      throw new AppError(HTTPStatusCode.BAD_REQUEST, 'UUID is not valid');
     }
 
     try {

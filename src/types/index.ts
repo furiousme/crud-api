@@ -1,3 +1,5 @@
+import { ServerResponse } from 'node:http';
+
 export interface User {
   id: string;
   username: string;
@@ -38,4 +40,14 @@ export enum HTTPStatusCode {
   BAD_REQUEST = 400,
   NOT_FOUND = 404,
   INTERNAL_SERVER = 500,
+}
+
+export interface ResponseData {
+  res: ServerResponse;
+  code: HTTPStatusCode;
+  payload?: {
+    message?: string;
+    data?: unknown;
+    success: boolean;
+  };
 }

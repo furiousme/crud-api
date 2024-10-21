@@ -9,7 +9,7 @@ const COLORS = {
 type LOGGER_MODE = 'info' | 'debug' | 'error';
 
 export const logger = {
-  write: (message: string, mode: LOGGER_MODE) => {
+  write(message: string, mode: LOGGER_MODE) {
     const time = new Date().toISOString();
     const formattedText = time + '\t' + message;
     const color = COLORS[mode];

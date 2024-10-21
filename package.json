@@ -7,6 +7,7 @@
     "start:dev": "nodemon -r dotenv/config src/index.ts dotenv_config_path=.env.development",
     "build": "webpack --config webpack.config.mjs",
     "start:prod": "npm run build && node dist/bundle.js",
+    "start:multi": "MODE=multi nodemon -r dotenv/config src/index.ts dotenv_config_path=.env.development",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "format": "prettier . --write",

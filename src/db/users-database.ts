@@ -1,5 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
-import { User } from "../types";
+import { v4 as uuidv4 } from 'uuid';
+import { User } from '../types';
 
 class UsersDatabase {
   storage: User[];
@@ -26,7 +26,7 @@ class UsersDatabase {
     });
   }
 
-  addOne(record: Omit<User, "id">): Promise<User> {
+  addOne(record: Omit<User, 'id'>): Promise<User> {
     return new Promise((resolve, reject) => {
       const id = uuidv4();
 
@@ -56,7 +56,7 @@ class UsersDatabase {
     });
   }
 
-  updateOne(id: string, record: Omit<User, "id">): Promise<User> {
+  updateOne(id: string, record: Omit<User, 'id'>): Promise<User> {
     return new Promise((resolve, reject) => {
       const ind = this.storage.findIndex((el) => el.id === id);
 

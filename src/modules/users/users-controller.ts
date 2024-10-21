@@ -1,4 +1,5 @@
-import { UnifiedArgs, UserData } from '../../types';
+import AppError from '../../errors/app-error';
+import { HTTPStatusCode, UnifiedArgs, UserData } from '../../types';
 import * as usersRepository from './users-repository';
 
 export const getUsers = async () => {
@@ -7,8 +8,12 @@ export const getUsers = async () => {
 };
 
 export const getUser = async ({ entityId }: UnifiedArgs) => {
-  const user = await usersRepository.getUser(entityId!);
-  return { data: user };
+  try {
+    const user = await usersRepository.getUser(entityId!);
+    return { data: user };
+  } catch {
+    throw new AppError(HTTPStatusCode.BAD_REQUEST, 'Failed to get user');
+  }
 };
 
 export const createNewUser = async ({ body }: UnifiedArgs) => {
@@ -21,10 +26,20 @@ export const updateUser = async ({ body, entityId }: UnifiedArgs) => {
     body as UserData,
     entityId!
   );
+  if (!updatedUser)
+    throw new AppError(
+      HTTPStatusCode.BAD_REQUEST,
+      `Failed to update a user with id ${entityId}`
+    );
   return { data: updatedUser };
 };
 
 export const deleteUser = async ({ entityId }: UnifiedArgs) => {
   const deletedUserId = await usersRepository.deleteUser(entityId!);
+  if (!deletedUserId)
+    throw new AppError(
+      HTTPStatusCode.BAD_REQUEST,
+      `Failed to delete a user with id ${entityId}`
+    );
   return { data: { deletedUserId } };
 };

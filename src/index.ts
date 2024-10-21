@@ -4,6 +4,7 @@ import { router } from './router';
 import { logger } from './logger';
 import { HTTPStatusCode, UnifiedHandlerResult } from './types';
 import AppError from './errors/app-error';
+import { sendNotFound } from './utils';
 
 http
   .createServer(async (req: IncomingMessage, res: ServerResponse) => {
@@ -15,11 +16,18 @@ http
     });
 
     const body = JSON.parse(rawBody as string);
+
     if (!method || !url || !url.startsWith('/api/')) {
-      return void res.end('Not found');
+      return sendNotFound(res);
     }
-    const [entityName, entityId] = url.substring(5).split('/'); // remove "/api/" substring
-    if (!(entityName in router)) return void res.end('Not found');
+
+    const [entityName, entityId, ...rest] = url
+      .substring(5) // remove "/api/" substring
+      .split('/')
+      .filter((el) => el);
+
+    if (!(entityName in router) || rest.length) return sendNotFound(res);
+
     const args = { entityName, entityId, body };
     const entity = router[entityName as keyof typeof router];
     const handler = entity[method as keyof typeof entity](args);
@@ -39,7 +47,7 @@ http
         res.end(e.message);
       } else {
         logger.error('Internal Server Error');
-        res.statusCode = 500;
+        res.statusCode = HTTPStatusCode.INTERNAL_SERVER;
         res.end('Internal Server Error');
       }
     }
